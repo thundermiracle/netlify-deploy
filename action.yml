@@ -1,0 +1,82 @@
+name: 'Netlify Deploy'
+description: 'Deploy to Netlify by Netlify-cli'
+inputs:
+  NETLIFY_AUTH_TOKEN:
+    description: 'Auth token of Netlify'
+    required: true
+  NETLIFY_SITE_ID:
+    description: "Site ID of your website in Netlify"
+    required: true
+  OUTPUT_DIR:
+    description: "Build output folder path"
+    required: false
+    default: "./dist"
+  PRODUCTION:
+    description: "Deploy production mode"
+    required: false
+  node:
+    description: "Node version"
+    required: false
+    default: "14"
+runs:
+  using: "composite"
+  steps:
+    - name: set up node.js v${{ inputs.node }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node }}
+        cache: "yarn"
+    - name: install netlify-cli
+      run: yarn global add netlify-cli
+      shell: bash
+
+    - name: deploy to preview mode
+      if: inputs.PRODUCTION == true
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ inputs.NETLIFY_AUTH_TOKEN}}
+        NETLIFY_SITE_ID: ${{ inputs.NETLIFY_SITE_ID}}
+      run: |
+        COMMAND="netlify deploy --dir=${{ inputs.OUTPUT_DIR }} -p"
+        OUTPUT=$(sh -c "$COMMAND")
+      shell: bash
+
+    - name: deploy to preview mode
+      if: inputs.PRODUCTION != true
+      id: deploy_preview
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ inputs.NETLIFY_AUTH_TOKEN}}
+        NETLIFY_SITE_ID: ${{ inputs.NETLIFY_SITE_ID}}
+      run: |
+        COMMAND="netlify deploy --dir=${{ inputs.OUTPUT_DIR }}"
+        OUTPUT=$(sh -c "$COMMAND")
+        NETLIFY_OUTPUT=$(echo "$OUTPUT")
+        NETLIFY_PREVIEW_URL=$(echo "$OUTPUT" | grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*(--)[a-zA-Z0-9./?=_-]*')
+        NETLIFY_LOGS_URL=$(echo "$OUTPUT" | grep -Eo '(http|https)://app.netlify.com/[a-zA-Z0-9./?=_-]*')
+        NETLIFY_LIVE_URL=$(echo "$OUTPUT" | grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*' | grep -Eov "netlify.com")
+        echo "::set-output name=NETLIFY_OUTPUT::$NETLIFY_OUTPUT"
+        echo "::set-output name=NETLIFY_PREVIEW_URL::$NETLIFY_PREVIEW_URL"
+        echo "::set-output name=NETLIFY_LOGS_URL::$NETLIFY_LOGS_URL"
+        echo "::set-output name=NETLIFY_LIVE_URL::$NETLIFY_LIVE_URL"
+      shell: bash
+
+    - name: find the comment
+      if: inputs.PRODUCTION != true
+      uses: peter-evans/find-comment@v1
+      id: fc
+      with:
+        issue-number: ${{ github.event.pull_request.number }}
+        comment-author: 'github-actions[bot]'
+        body-includes: Netlify Preview Deployment Information
+
+    - name: create or update comment
+      if: inputs.PRODUCTION != true
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        comment-id: ${{ steps.fc.outputs.comment-id }}
+        issue-number: ${{ github.event.pull_request.number }}
+        body: |
+          Netlify Preview Deployment Information
+          - Log URL: ${{ steps.deploy_preview.outputs.NETLIFY_LOGS_URL }}
+          - Preview URL: ${{ steps.deploy_preview.outputs.NETLIFY_PREVIEW_URL }}
+        edit-mode: replace
+    
