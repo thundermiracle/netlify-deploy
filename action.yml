@@ -18,14 +18,44 @@ inputs:
     description: "Node version"
     required: false
     default: "14"
+  build_command:
+    description: "Build command"
+    required: false
+    default: "yarn build"
+  cache_path:
+    description: "Paths for cache"
+    required: false
+    default: |
+      .cache
+      public
+      node_modules
+  
 runs:
   using: "composite"
   steps:
+    - name: checkout
+      uses: actions/checkout@v3
+
     - name: set up node.js v${{ inputs.node }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
         cache: "yarn"
+
+    - name: cache node_modules
+      uses: actions/cache@v2
+      with:
+        path: inputs.cache_path
+        key: node-v${{ inputs.node }}-${{ hashFiles(format('{0}{1}', github.workspace, '/yarn.lock')) }}
+
+    - name: install dependencies
+      run: yarn --check-files --frozen-lockfile --non-interactive
+      shell: bash
+
+    - name: build
+      run: yarn build:netlify:sub
+      shell: bash
+
     - name: install netlify-cli
       run: yarn global add netlify-cli
       shell: bash
