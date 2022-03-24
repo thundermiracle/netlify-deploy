@@ -7,11 +7,11 @@ inputs:
   NETLIFY_SITE_ID:
     description: "Site ID of your website in Netlify"
     required: true
-  OUTPUT_DIR:
+  deploy_dir:
     description: "Build output folder path"
     required: false
     default: "./dist"
-  PRODUCTION:
+  production:
     description: "Deploy production mode"
     required: false
   node:
@@ -30,24 +30,22 @@ runs:
       run: yarn global add netlify-cli
       shell: bash
 
-    - name: deploy to preview mode
-      if: inputs.PRODUCTION == true
+    - name: deploy to production mode
+      if: inputs.production == true
       env:
         NETLIFY_AUTH_TOKEN: ${{ inputs.NETLIFY_AUTH_TOKEN}}
         NETLIFY_SITE_ID: ${{ inputs.NETLIFY_SITE_ID}}
-      run: |
-        COMMAND="netlify deploy --dir=${{ inputs.OUTPUT_DIR }} -p"
-        OUTPUT=$(sh -c "$COMMAND")
+      run: netlify deploy --dir=${{ inputs.deploy_dir }} -p
       shell: bash
 
     - name: deploy to preview mode
-      if: inputs.PRODUCTION != true
+      if: inputs.production != true
       id: deploy_preview
       env:
         NETLIFY_AUTH_TOKEN: ${{ inputs.NETLIFY_AUTH_TOKEN}}
         NETLIFY_SITE_ID: ${{ inputs.NETLIFY_SITE_ID}}
       run: |
-        COMMAND="netlify deploy --dir=${{ inputs.OUTPUT_DIR }}"
+        COMMAND="netlify deploy --dir=${{ inputs.deploy_dir }}"
         OUTPUT=$(sh -c "$COMMAND")
         NETLIFY_OUTPUT=$(echo "$OUTPUT")
         NETLIFY_PREVIEW_URL=$(echo "$OUTPUT" | grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*(--)[a-zA-Z0-9./?=_-]*')
@@ -60,7 +58,7 @@ runs:
       shell: bash
 
     - name: find the comment
-      if: inputs.PRODUCTION != true
+      if: inputs.production != true
       uses: peter-evans/find-comment@v1
       id: fc
       with:
@@ -69,7 +67,7 @@ runs:
         body-includes: Netlify Preview Deployment Information
 
     - name: create or update comment
-      if: inputs.PRODUCTION != true
+      if: inputs.production != true
       uses: peter-evans/create-or-update-comment@v1
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
