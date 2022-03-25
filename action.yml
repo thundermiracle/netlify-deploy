@@ -22,13 +22,22 @@ inputs:
     description: "Build command"
     required: false
     default: "yarn build"
+  install_command:
+    description: "Install command"
+    required: false
+    default: "yarn --check-files --frozen-lockfile --non-interactive"
   cache_path:
     description: "Paths for cache"
     required: false
-    default: |
-      .cache
-      public
-      node_modules
+    default: node_modules
+  cache_strategy:
+    description: "yarn, npm, or pnpm"
+    required: false
+    default: yarn
+  lock_file:
+    description: "Path of your lock file"
+    required: false
+    default: "/yarn.lock"
   
 runs:
   using: "composite"
@@ -40,20 +49,20 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
-        cache: "yarn"
+        cache: ${{ inputs.cache_strategy }}
 
     - name: cache node_modules
       uses: actions/cache@v2
       with:
         path: inputs.cache_path
-        key: node-v${{ inputs.node }}-${{ hashFiles(format('{0}{1}', github.workspace, '/yarn.lock')) }}
+        key: node-v${{ inputs.node }}-${{ hashFiles(format('{0}{1}', github.workspace, '${{ inputs.lock_file }}')) }}
 
     - name: install dependencies
-      run: yarn --check-files --frozen-lockfile --non-interactive
+      run: ${{ inputs.install_command }}
       shell: bash
 
     - name: build
-      run: yarn build:netlify:sub
+      run: ${{ inputs.build_command }}
       shell: bash
 
     - name: install netlify-cli

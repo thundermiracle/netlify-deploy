@@ -6,12 +6,14 @@ Github action to deploy to Netlify.
 
 Add one step to your jobs.
 
+※. This action uses `yarn` as default dependency manager. If you want to use another dependency manager, you need to override each input.
+
 ```yaml
 jobs:
   deploy:
      steps:
        - name: deploy to preview mode
-         uses: thundermiracle/netlify-deploy@v0.1.0
+         uses: thundermiracle/netlify-deploy@v1
          with:
            NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
            NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
@@ -29,6 +31,11 @@ jobs:
 | deploy_dir |  | ./dist | Directory to be uploaded to Netlify |
 | production |  | false | Deploy to production mode flag |
 | node |  | 14 | Node version to run deployment |
+| build_command | △ | yarn build | |
+| install_command | △ | yarn --check-files --frozen-lockfile --non-interactive | ※ You should override it if you're not using yarn as your dependency manager |
+| cache_path | | node_modules | |
+| cache_strategy | △ | yarn | `yarn`, `npm`, or `pnpm` |
+| lock_file | △ | /yarn.lock | ※ You should override it if you're not using yarn as your dependency manager |
 
 ## License
 
