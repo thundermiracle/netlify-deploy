@@ -38,7 +38,7 @@ inputs:
   lock_file:
     description: "Path of your lock file"
     required: false
-    default: "/yarn.lock"
+    default: "**/yarn.lock"
   
 runs:
   using: "composite"
@@ -56,7 +56,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: inputs.cache_path
-        key: node-v${{ inputs.node }}-${{ hashFiles(format('{0}{1}', github.workspace, '${{ inputs.lock_file }}')) }}
+        key: node-v${{ inputs.node }}-${{ hashFiles('${{ inputs.lock_file }}') }}
 
     - name: install dependencies
       run: ${{ inputs.install_command }}
