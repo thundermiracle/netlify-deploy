@@ -14,6 +14,7 @@ inputs:
   production:
     description: "Deploy production mode"
     required: false
+    default: "false"
   node:
     description: "Node version"
     required: false
@@ -70,7 +71,7 @@ runs:
       shell: bash
 
     - name: deploy to production mode
-      if: inputs.production == true
+      if: inputs.production == 'true'
       env:
         NETLIFY_AUTH_TOKEN: ${{ inputs.NETLIFY_AUTH_TOKEN}}
         NETLIFY_SITE_ID: ${{ inputs.NETLIFY_SITE_ID}}
@@ -78,7 +79,7 @@ runs:
       shell: bash
 
     - name: deploy to preview mode
-      if: inputs.production != true
+      if: inputs.production != 'true'
       id: deploy_preview
       env:
         NETLIFY_AUTH_TOKEN: ${{ inputs.NETLIFY_AUTH_TOKEN}}
@@ -97,7 +98,7 @@ runs:
       shell: bash
 
     - name: find the comment
-      if: inputs.production != true
+      if: inputs.production != 'true'
       uses: peter-evans/find-comment@v1
       id: fc
       with:
@@ -106,7 +107,7 @@ runs:
         body-includes: Netlify Preview Deployment Information
 
     - name: create or update comment
-      if: inputs.production != true
+      if: inputs.production != 'true'
       uses: peter-evans/create-or-update-comment@v1
       with:
         comment-id: ${{ steps.fc.outputs.comment-id }}
