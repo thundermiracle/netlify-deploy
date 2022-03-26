@@ -1,6 +1,6 @@
 # Netlify Deploy with Comments
 
-Github action to deploy to Netlify.
+Github action to deploy to Netlify with Comments of Preview and Log URL.
 
 ## Table of contents
 
