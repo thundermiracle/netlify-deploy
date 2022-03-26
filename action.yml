@@ -50,14 +50,12 @@ runs:
     - name: install pnpm
       if: inputs.cache_strategy == 'pnpm'
       uses: pnpm/action-setup@v2
-      working-directory: ${{ inputs.working-directory }}
 
     - name: set up node.js v${{ inputs.node }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
         cache: ${{ inputs.cache_strategy }}
-      working-directory: ${{ inputs.working-directory }}
 
     - name: generate hash for cache
       if: inputs.cache_strategy != 'pnpm'
@@ -90,7 +88,6 @@ runs:
       with:
         path: inputs.cache_path
         key: node-v${{ inputs.node }}-${{ steps.generate_hash.outputs.CACHE_HASH }}
-      working-directory: ${{ inputs.working-directory }}
 
     - name: install dependencies
       run: ${{ inputs.install_command }}
