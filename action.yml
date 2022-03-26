@@ -35,10 +35,6 @@ inputs:
     description: "yarn, npm, or pnpm"
     required: false
     default: yarn
-  lock_file:
-    description: "Path of your lock file"
-    required: false
-    default: "**/yarn.lock"
   
 runs:
   using: "composite"
@@ -46,17 +42,46 @@ runs:
     - name: checkout
       uses: actions/checkout@v3
 
+    - name: install pnpm
+      if: inputs.cache_strategy == 'pnpm'
+      uses: pnpm/action-setup@v2
+
     - name: set up node.js v${{ inputs.node }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
         cache: ${{ inputs.cache_strategy }}
 
+    - name: generate hash for cache
+      if: inputs.cache_strategy != 'pnpm'
+      id: generate_hash
+      run: |
+        case ${{ inputs.cache_strategy }} in
+          'npm' )
+            CACHE_HASH=${{ hashFiles('**/package-lock.json') }}
+            echo "Generate hash from package-lock.json: $CACHE_HASH"
+            echo "::set-output name=CACHE_HASH::$CACHE_HASH"
+            exit 0;
+            ;;
+          'yarn' )
+            CACHE_HASH=${{ hashFiles('**/yarn.lock') }}
+            echo "Generate hash from yarn.lock: $CACHE_HASH"
+            echo "::set-output name=CACHE_HASH::$CACHE_HASH"
+            exit 0;
+            ;;
+          * )
+            echo "cache_strategy ${{ inputs.cache_strategy }} is not supported."
+            exit 1
+            ;;
+        esac
+      shell: bash
+
     - name: cache node_modules
+      if: inputs.cache_strategy != 'pnpm'
       uses: actions/cache@v2
       with:
         path: inputs.cache_path
-        key: node-v${{ inputs.node }}-${{ hashFiles('${{ inputs.lock_file }}') }}
+        key: node-v${{ inputs.node }}-${{ steps.generate_hash.outputs.CACHE_HASH }}
 
     - name: install dependencies
       run: ${{ inputs.install_command }}

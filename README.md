@@ -35,7 +35,6 @@ jobs:
 | install_command | △ | yarn --check-files --frozen-lockfile --non-interactive | ※ You should override it if you're not using yarn as your dependency manager |
 | cache_path | | node_modules | |
 | cache_strategy | △ | yarn | `yarn`, `npm`, or `pnpm` |
-| lock_file | △ | **/yarn.lock | ※ You should override it if you're not using yarn as your dependency manager |
 
 ## License
 
