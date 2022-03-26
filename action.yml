@@ -1,5 +1,5 @@
-name: 'Netlify Deploy'
-description: 'Deploy to Netlify by Netlify-cli'
+name: 'Netlify Deploy with Comments'
+description: 'Deploy to Netlify by Netlify-cli with Comments of Preview and Log URL'
 inputs:
   NETLIFY_AUTH_TOKEN:
     description: 'Auth token of Netlify'
