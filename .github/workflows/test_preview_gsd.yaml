@@ -4,10 +4,6 @@ on:
   pull_request:
     types: ['opened', 'edited', 'synchronize']
 
-defaults:
-  run:
-    working-directory: ./examples/gatsby-starter-default
-
 jobs:
   test_deploy_gatsbyjs_yarn:
     name: Test Deploy GatsbyJS site to Netlify managed by pnpm
@@ -25,3 +21,4 @@ jobs:
             .cache
             public
             node_modules
+          working-directory: ./examples/gatsby-starter-default

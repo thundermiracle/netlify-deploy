@@ -35,12 +35,16 @@ inputs:
     description: "yarn, npm, or pnpm"
     required: false
     default: yarn
+  working-directory:
+    description: "Working Directory"
+    required: false
   
 runs:
   using: "composite"
   steps:
     - name: checkout
       uses: actions/checkout@v3
+      working-directory: ${{ inputs.working-directory }}
 
     - name: install pnpm
       if: inputs.cache_strategy == 'pnpm'
