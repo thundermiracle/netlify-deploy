@@ -93,7 +93,7 @@ runs:
 
     - name: cache node_modules
       if: inputs.cache-strategy != 'pnpm'
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: inputs.cache-path
         key: node-v${{ inputs.node }}-${{ steps.info_for_cache.outputs.CACHE_HASH }}
