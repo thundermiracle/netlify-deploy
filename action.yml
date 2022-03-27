@@ -1,5 +1,8 @@
 name: 'Netlify Deploy with Comments'
 description: 'Deploy to Netlify by Netlify-cli with Comments of Preview and Log URL'
+branding:
+  icon: check-square
+  color: green
 inputs:
   NETLIFY_AUTH_TOKEN:
     description: 'Auth token of Netlify'
@@ -35,6 +38,9 @@ inputs:
     description: "yarn, npm, or pnpm"
     required: false
     default: yarn
+  working-directory:
+    description: "Working Directory"
+    required: false
   
 runs:
   using: "composite"
@@ -46,28 +52,30 @@ runs:
       if: inputs.cache_strategy == 'pnpm'
       uses: pnpm/action-setup@v2
 
-    - name: set up node.js v${{ inputs.node }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ inputs.node }}
-        cache: ${{ inputs.cache_strategy }}
-
-    - name: generate hash for cache
-      if: inputs.cache_strategy != 'pnpm'
-      id: generate_hash
+    - name: generate info for cache
+      id: info_for_cache
       run: |
         case ${{ inputs.cache_strategy }} in
           'npm' )
+            LOCK_FILE_PATH="${{ inputs.working-directory }}/package-lock.json"
             CACHE_HASH=${{ hashFiles('**/package-lock.json') }}
+            echo "Path of lock file is: $LOCK_FILE_PATH"
             echo "Generate hash from package-lock.json: $CACHE_HASH"
             echo "::set-output name=CACHE_HASH::$CACHE_HASH"
-            exit 0;
+            echo "::set-output name=LOCK_FILE_PATH::$LOCK_FILE_PATH"
             ;;
           'yarn' )
+            LOCK_FILE_PATH="${{ inputs.working-directory }}/yarn.lock"
             CACHE_HASH=${{ hashFiles('**/yarn.lock') }}
+            echo "Path of lock file is: $LOCK_FILE_PATH"
             echo "Generate hash from yarn.lock: $CACHE_HASH"
             echo "::set-output name=CACHE_HASH::$CACHE_HASH"
-            exit 0;
+            echo "::set-output name=LOCK_FILE_PATH::$LOCK_FILE_PATH"
+            ;;
+          'pnpm' )
+            LOCK_FILE_PATH="${{ inputs.working-directory }}/pnpm-lock.yaml"
+            echo "Path of lock file is: $LOCK_FILE_PATH"
+            echo "::set-output name=LOCK_FILE_PATH::$LOCK_FILE_PATH"
             ;;
           * )
             echo "cache_strategy ${{ inputs.cache_strategy }} is not supported."
@@ -76,24 +84,34 @@ runs:
         esac
       shell: bash
 
+    - name: set up node.js v${{ inputs.node }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node }}
+        cache: ${{ inputs.cache_strategy }}
+        cache-dependency-path: ${{ steps.info_for_cache.outputs.LOCK_FILE_PATH }}
+
     - name: cache node_modules
       if: inputs.cache_strategy != 'pnpm'
       uses: actions/cache@v2
       with:
         path: inputs.cache_path
-        key: node-v${{ inputs.node }}-${{ steps.generate_hash.outputs.CACHE_HASH }}
+        key: node-v${{ inputs.node }}-${{ steps.info_for_cache.outputs.CACHE_HASH }}
 
     - name: install dependencies
       run: ${{ inputs.install_command }}
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
 
     - name: build
       run: ${{ inputs.build_command }}
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
 
     - name: install netlify-cli
       run: yarn global add netlify-cli
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
 
     - name: deploy to production mode
       if: inputs.production == 'true'
@@ -102,6 +120,7 @@ runs:
         NETLIFY_SITE_ID: ${{ inputs.NETLIFY_SITE_ID}}
       run: netlify deploy --dir=${{ inputs.deploy_dir }} -p
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
 
     - name: deploy to preview mode
       if: inputs.production != 'true'
@@ -121,6 +140,7 @@ runs:
         echo "::set-output name=NETLIFY_LOGS_URL::$NETLIFY_LOGS_URL"
         echo "::set-output name=NETLIFY_LIVE_URL::$NETLIFY_LIVE_URL"
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
 
     - name: find the comment
       if: inputs.production != 'true'

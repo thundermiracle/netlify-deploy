@@ -1,0 +1,26 @@
+name: Test Action Netlify Deploy in production mode
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test_deploy_gatsbyjs_yarn_prod:
+    name: Test Deploy GatsbyJS site to Netlify managed by yarn
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: deploy to production mode
+        uses: ./
+        with:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          deploy_dir: ./public
+          cache_path: |
+            .cache
+            public
+            node_modules
+          working-directory: ./examples/gatsby-starter-default
+          production: true
