@@ -49,23 +49,29 @@ runs:
       if: inputs.cache_strategy == 'pnpm'
       uses: pnpm/action-setup@v2
 
-    - name: get path of lock file
-      id: generate_path
+    - name: generate info for cache
+      id: info_for_cache
       run: |
         case ${{ inputs.cache_strategy }} in
           'npm' )
             LOCK_FILE_PATH="${{ inputs.working-directory }}/package-lock.json"
-            echo "Path of lock file is: $CACHE_HASH"
+            CACHE_HASH=${{ hashFiles('**/package-lock.json') }}
+            echo "Path of lock file is: $LOCK_FILE_PATH"
+            echo "Generate hash from package-lock.json: $CACHE_HASH"
+            echo "::set-output name=CACHE_HASH::$CACHE_HASH"
             echo "::set-output name=LOCK_FILE_PATH::$LOCK_FILE_PATH"
             ;;
           'yarn' )
             LOCK_FILE_PATH="${{ inputs.working-directory }}/yarn.lock"
-            echo "Path of lock file is: $CACHE_HASH"
+            CACHE_HASH=${{ hashFiles('**/yarn.lock') }}
+            echo "Path of lock file is: $LOCK_FILE_PATH"
+            echo "Generate hash from yarn.lock: $CACHE_HASH"
+            echo "::set-output name=CACHE_HASH::$CACHE_HASH"
             echo "::set-output name=LOCK_FILE_PATH::$LOCK_FILE_PATH"
             ;;
           'pnpm' )
             LOCK_FILE_PATH="${{ inputs.working-directory }}/pnpm-lock.yaml"
-            echo "Path of lock file is: $CACHE_HASH"
+            echo "Path of lock file is: $LOCK_FILE_PATH"
             echo "::set-output name=LOCK_FILE_PATH::$LOCK_FILE_PATH"
             ;;
           * )
@@ -80,37 +86,14 @@ runs:
       with:
         node-version: ${{ inputs.node }}
         cache: ${{ inputs.cache_strategy }}
-        cache-dependency-path: ${{ steps.generate_path.outputs.LOCK_FILE_PATH }}
-
-    - name: generate hash for cache
-      if: inputs.cache_strategy != 'pnpm'
-      id: generate_hash
-      run: |
-        case ${{ inputs.cache_strategy }} in
-          'npm' )
-            CACHE_HASH=${{ hashFiles('**/package-lock.json') }}
-            echo "Generate hash from package-lock.json: $CACHE_HASH"
-            echo "::set-output name=CACHE_HASH::$CACHE_HASH"
-            ;;
-          'yarn' )
-            CACHE_HASH=${{ hashFiles('**/yarn.lock') }}
-            echo "Generate hash from yarn.lock: $CACHE_HASH"
-            echo "::set-output name=CACHE_HASH::$CACHE_HASH"
-            ;;
-          * )
-            echo "cache_strategy ${{ inputs.cache_strategy }} is not supported."
-            exit 1
-            ;;
-        esac
-      shell: bash
-      working-directory: ${{ inputs.working-directory }}
+        cache-dependency-path: ${{ steps.info_for_cache.outputs.LOCK_FILE_PATH }}
 
     - name: cache node_modules
       if: inputs.cache_strategy != 'pnpm'
       uses: actions/cache@v2
       with:
         path: inputs.cache_path
-        key: node-v${{ inputs.node }}-${{ steps.generate_hash.outputs.CACHE_HASH }}
+        key: node-v${{ inputs.node }}-${{ steps.info_for_cache.outputs.CACHE_HASH }}
 
     - name: install dependencies
       run: ${{ inputs.install_command }}
