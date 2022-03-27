@@ -8,54 +8,54 @@ inputs:
     description: 'Auth token of Netlify'
     required: true
   NETLIFY_SITE_ID:
-    description: "Site ID of your website in Netlify"
+    description: 'Site ID of your website in Netlify'
     required: true
-  deploy_dir:
-    description: "Build output folder path"
+  deploy-dir:
+    description: 'Build output folder path'
     required: false
-    default: "./dist"
+    default: ./dist
   production:
-    description: "Deploy production mode"
+    description: 'Deploy production mode'
     required: false
-    default: "false"
+    default: 'false'
   node:
-    description: "Node version"
+    description: 'Node version'
     required: false
-    default: "14"
-  build_command:
-    description: "Build command"
+    default: '14'
+  build-command:
+    description: 'Build command'
     required: false
-    default: "yarn build"
-  install_command:
-    description: "Install command"
+    default: yarn build
+  install-command:
+    description: 'Install command'
     required: false
-    default: "yarn --check-files --frozen-lockfile --non-interactive"
-  cache_path:
-    description: "Paths for cache"
+    default: yarn --check-files --frozen-lockfile --non-interactive
+  cache-path:
+    description: 'Paths for cache'
     required: false
     default: node_modules
-  cache_strategy:
-    description: "yarn, npm, or pnpm"
+  cache-strategy:
+    description: 'yarn, npm, or pnpm'
     required: false
     default: yarn
   working-directory:
-    description: "Working Directory"
+    description: 'Working Directory'
     required: false
   
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: checkout
       uses: actions/checkout@v3
 
     - name: install pnpm
-      if: inputs.cache_strategy == 'pnpm'
+      if: inputs.cache-strategy == 'pnpm'
       uses: pnpm/action-setup@v2
 
     - name: generate info for cache
       id: info_for_cache
       run: |
-        case ${{ inputs.cache_strategy }} in
+        case ${{ inputs.cache-strategy }} in
           'npm' )
             LOCK_FILE_PATH="${{ inputs.working-directory }}/package-lock.json"
             CACHE_HASH=${{ hashFiles('**/package-lock.json') }}
@@ -78,7 +78,7 @@ runs:
             echo "::set-output name=LOCK_FILE_PATH::$LOCK_FILE_PATH"
             ;;
           * )
-            echo "cache_strategy ${{ inputs.cache_strategy }} is not supported."
+            echo "cache-strategy ${{ inputs.cache-strategy }} is not supported."
             exit 1
             ;;
         esac
@@ -88,23 +88,23 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node }}
-        cache: ${{ inputs.cache_strategy }}
+        cache: ${{ inputs.cache-strategy }}
         cache-dependency-path: ${{ steps.info_for_cache.outputs.LOCK_FILE_PATH }}
 
     - name: cache node_modules
-      if: inputs.cache_strategy != 'pnpm'
+      if: inputs.cache-strategy != 'pnpm'
       uses: actions/cache@v2
       with:
-        path: inputs.cache_path
+        path: inputs.cache-path
         key: node-v${{ inputs.node }}-${{ steps.info_for_cache.outputs.CACHE_HASH }}
 
     - name: install dependencies
-      run: ${{ inputs.install_command }}
+      run: ${{ inputs.install-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
     - name: build
-      run: ${{ inputs.build_command }}
+      run: ${{ inputs.build-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
@@ -118,7 +118,7 @@ runs:
       env:
         NETLIFY_AUTH_TOKEN: ${{ inputs.NETLIFY_AUTH_TOKEN}}
         NETLIFY_SITE_ID: ${{ inputs.NETLIFY_SITE_ID}}
-      run: netlify deploy --dir=${{ inputs.deploy_dir }} -p
+      run: netlify deploy --dir=${{ inputs.deploy-dir }} -p
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
@@ -129,16 +129,13 @@ runs:
         NETLIFY_AUTH_TOKEN: ${{ inputs.NETLIFY_AUTH_TOKEN}}
         NETLIFY_SITE_ID: ${{ inputs.NETLIFY_SITE_ID}}
       run: |
-        COMMAND="netlify deploy --dir=${{ inputs.deploy_dir }}"
+        COMMAND="netlify deploy --dir=${{ inputs.deploy-dir }}"
         OUTPUT=$(sh -c "$COMMAND")
         NETLIFY_OUTPUT=$(echo "$OUTPUT")
         NETLIFY_PREVIEW_URL=$(echo "$OUTPUT" | grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*(--)[a-zA-Z0-9./?=_-]*')
         NETLIFY_LOGS_URL=$(echo "$OUTPUT" | grep -Eo '(http|https)://app.netlify.com/[a-zA-Z0-9./?=_-]*')
-        NETLIFY_LIVE_URL=$(echo "$OUTPUT" | grep -Eo '(http|https)://[a-zA-Z0-9./?=_-]*' | grep -Eov "netlify.com")
-        echo "::set-output name=NETLIFY_OUTPUT::$NETLIFY_OUTPUT"
         echo "::set-output name=NETLIFY_PREVIEW_URL::$NETLIFY_PREVIEW_URL"
         echo "::set-output name=NETLIFY_LOGS_URL::$NETLIFY_LOGS_URL"
-        echo "::set-output name=NETLIFY_LIVE_URL::$NETLIFY_LIVE_URL"
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
