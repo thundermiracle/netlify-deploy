@@ -1,5 +1,8 @@
 name: 'Netlify Deploy with Comments'
 description: 'Deploy to Netlify by Netlify-cli with Comments of Preview and Log URL'
+branding:
+  icon: check-square
+  color: green
 inputs:
   NETLIFY_AUTH_TOKEN:
     description: 'Auth token of Netlify'
