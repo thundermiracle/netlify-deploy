@@ -1,0 +1,23 @@
+{
+  "extends": [
+    "config:base",
+    "schedule:monthly",
+    "group:allNonMajor"
+  ],
+  "rebaseWhen": "conflicted",
+  "labels": [
+    "dependencies"
+  ],
+  "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "groupName": "GatsbyJS yarn example",
+      "matchPaths": [
+        "examples/gatsby-starter-default/**"
+      ]
+    }
+  ],
+  "ignoreDeps": [
+    "node"
+  ]
+}
