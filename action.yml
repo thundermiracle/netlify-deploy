@@ -41,6 +41,7 @@ inputs:
   working-directory:
     description: 'Working Directory'
     required: false
+    default: '**'
   
 runs:
   using: composite
