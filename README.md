@@ -6,6 +6,7 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
 
 * [Usage](#usage)
 * [Options](#options)
+* [What's `NEW` in this Github action?](#whats-new-in-this-github-action)
 * [Examples](#examples)
   * [GatsbyJS with yarn](#gatsbyjs-with-yarn)
   * [GatsbyJS with npm](#gatsbyjs-with-npm)
@@ -56,6 +57,18 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
 | cache-path | | node_modules | |
 | cache-strategy | △ | yarn | `yarn`, `npm`, or `pnpm` |
 | working-directory | | | Working directory of your project |
+
+## What's `NEW` in this Github action?
+
+1. Automatically cache dependencies of your project.
+
+    You can override `cache-path` and `cache-strategy` to customize the cache.
+2. Add comment with Preview URL and Log URL to your pull request automatically.
+
+    ![comment in pull request](./assets/comment_in_pr.png)
+3. `working-directory` is supported.
+
+    To deploy your project in sub directory easily, just set `working-directory` like `./packages/my-package`.
 
 ## Examples
 
