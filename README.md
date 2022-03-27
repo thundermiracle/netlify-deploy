@@ -55,6 +55,7 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
 | install_command | △ | yarn --check-files --frozen-lockfile --non-interactive | ※ You should override it if you're not using yarn as your dependency manager |
 | cache_path | | node_modules | |
 | cache_strategy | △ | yarn | `yarn`, `npm`, or `pnpm` |
+| working-directory | | | Working directory of your project |
 
 ## Examples
 
