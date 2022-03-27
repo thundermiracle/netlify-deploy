@@ -32,7 +32,7 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
       deploy:
         steps:
           - name: deploy to preview mode
-            uses: thundermiracle/netlify-deploy@v1
+            uses: thundermiracle/netlify-deploy@v2.0.0
             with:
               NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
               NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
@@ -90,7 +90,7 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
 
         steps:
           - name: deploy to preview mode
-            uses: thundermiracle/netlify-deploy@v1
+            uses: thundermiracle/netlify-deploy@v2.0.0
             with:
               NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
               NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
@@ -118,7 +118,7 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
 
         steps:
           - name: deploy to production mode
-            uses: thundermiracle/netlify-deploy@v1
+            uses: thundermiracle/netlify-deploy@v2.0.0
             with:
               NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
               NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
@@ -147,7 +147,7 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
 
         steps:
           - name: deploy to preview mode
-            uses: thundermiracle/netlify-deploy@v1
+            uses: thundermiracle/netlify-deploy@v2.0.0
             with:
               NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
               NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
@@ -178,7 +178,7 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
 
         steps:
           - name: deploy to production mode
-            uses: thundermiracle/netlify-deploy@v1
+            uses: thundermiracle/netlify-deploy@v2.0.0
             with:
               NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
               NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
