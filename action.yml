@@ -96,7 +96,7 @@ runs:
       if: inputs.cache-strategy != 'pnpm'
       uses: actions/cache@v3
       with:
-        path: inputs.cache-path
+        path: ${{ inputs.cache-path }}
         key: node-v${{ inputs.node }}-${{ steps.info_for_cache.outputs.CACHE_HASH }}
 
     - name: install dependencies
