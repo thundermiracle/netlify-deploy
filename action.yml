@@ -42,7 +42,12 @@ inputs:
     description: 'Working Directory'
     required: false
     default: '.'
-  
+
+outputs:
+  NETLIFY_PREVIEW_URL:
+    description: "preview URL"
+    value: ${{ steps.deploy_preview.outputs.NETLIFY_PREVIEW_URL }}
+
 runs:
   using: composite
   steps:

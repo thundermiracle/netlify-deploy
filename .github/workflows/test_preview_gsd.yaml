@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: deploy to preview mode
+        id: pr
         uses: ./
         with:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
@@ -22,3 +23,6 @@ jobs:
             public
             node_modules
           working-directory: ./examples/gatsby-starter-default
+      - name: echo outputs
+        run: | 
+          echo "[NETLIFY_PREVIEW_URL]: ${{ steps.pr.outputs.NETLIFY_PREVIEW_URL }}"
