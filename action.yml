@@ -108,7 +108,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: ${{ inputs.extra-cache-path }}
-        key: node-v${{ inputs.node }}-${{ github.sha }}
+        key: extra-cache-v${{ inputs.node }}-${{ github.sha }}
 
     - name: install dependencies
       run: ${{ inputs.install-command }}
