@@ -109,6 +109,9 @@ runs:
       with:
         path: ${{ inputs.extra-cache-path }}
         key: extra-cache-v${{ inputs.node }}-${{ github.sha }}
+        restore-keys: |
+          extra-cache-v${{ inputs.node }}-${{ github.sha }}
+          extra-cache-v${{ inputs.node }}-
 
     - name: install dependencies
       run: ${{ inputs.install-command }}
