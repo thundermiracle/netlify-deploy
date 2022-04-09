@@ -103,17 +103,17 @@ runs:
         path: node_modules
         key: node-v${{ inputs.node }}-${{ steps.info_for_cache.outputs.CACHE_HASH }}
 
+    - name: cache extra paths
+      if: inputs.extra-cache-path != ''
+      uses: actions/cache@v3
+      with:
+        path: ${{ inputs.extra-cache-path }}
+        key: node-v${{ inputs.node }}-${{ github.sha }}
+
     - name: install dependencies
       run: ${{ inputs.install-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-
-    - name: download extra cache
-      if: inputs.extra-cache-path != ''
-      uses: actions/download-artifact@v3
-      with:
-        name: extra-cache
-        path: ${{ inputs.extra-cache-path }}
 
     - name: build
       run: ${{ inputs.build-command }}
@@ -171,10 +171,3 @@ runs:
           - Log URL: ${{ steps.deploy_preview.outputs.NETLIFY_LOGS_URL }}
           - Preview URL: ${{ steps.deploy_preview.outputs.NETLIFY_PREVIEW_URL }}
         edit-mode: replace
-
-    - name: upload extra cache
-      if: inputs.extra-cache-path != ''
-      uses: actions/upload-artifact@v3
-      with:
-        name: extra-cache
-        path: ${{ inputs.extra-cache-path }}
