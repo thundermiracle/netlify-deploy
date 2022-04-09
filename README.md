@@ -54,19 +54,22 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
 | node |  | 14 | Node version to run deployment |
 | build-command | △ | yarn build | |
 | install-command | △ | yarn --check-files --frozen-lockfile --non-interactive | ※ You should override it if you're not using yarn as your dependency manager |
-| cache-path | | node_modules | |
 | cache-strategy | △ | yarn | `yarn`, `npm`, or `pnpm` |
+| extra-cache-path | | | extra cache paths(eg: `.cache` in GatsbyJS) |
 | working-directory | | | Working directory of your project |
 
 ## What's `NEW` in this Github action?
 
 1. Automatically cache dependencies of your project.
 
-    You can override `cache-path` and `cache-strategy` to customize the cache.
-2. Add comment with Preview URL and Log URL to your pull request automatically.
+    You can override `cache-strategy` to customize the cache.
+2. Cache extra paths for specific projects.
+
+    You can override `extra-cache-path` to enable extra cache policy(eg: `.cache` & `public` folders for `GatsbyJS`).
+3. Add comment with Preview URL and Log URL to your pull request automatically.
 
     ![comment in pull request](./assets/comment_in_pr.png)
-3. `working-directory` is supported.
+4. `working-directory` is supported.
 
     To deploy your project in sub directory easily, just set `working-directory` like `./packages/my-package`.
 
@@ -95,10 +98,9 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
               NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
               NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
               deploy-dir: "./public"
-              cache-path: |
+              extra-cache-path: |
                 .cache
                 public
-                node_modules
     ```
 
 2. For production build, create a `.github/workflows/production.yml` file with the following content.
@@ -123,10 +125,9 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
               NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
               NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
               deploy-dir: "./public"
-              cache-path: |
+              extra-cache-path: |
                 .cache
                 public
-                node_modules
               production: true
     ```
 ### GatsbyJS with npm
@@ -152,10 +153,9 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
               NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
               NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
               deploy-dir: "./public"
-              cache-path: |
+              extra-cache-path: |
                 .cache
                 public
-                node_modules
               cache-strategy: npm
               install-command: npm install --production
               build-command: npm run build
@@ -183,10 +183,9 @@ Github action to deploy to Netlify with Comments of Preview and Log URL.
               NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN}}
               NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID}}
               deploy-dir: "./public"
-              cache-path: |
+              extra-cache-path: |
                 .cache
                 public
-                node_modules
               production: true
               cache-strategy: npm
               install-command: npm install --production

@@ -18,10 +18,9 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
           deploy-dir: ./public
-          cache-path: |
+          extra-cache-path: |
             .cache
             public
-            node_modules
           working-directory: ./examples/gatsby-starter-default
       - name: echo outputs
         run: | 
