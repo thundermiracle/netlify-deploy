@@ -30,14 +30,13 @@ inputs:
     description: 'Install command'
     required: false
     default: yarn --check-files --frozen-lockfile --non-interactive
-  cache-path:
-    description: 'Paths for cache'
-    required: false
-    default: node_modules
   cache-strategy:
     description: 'yarn, npm, or pnpm'
     required: false
     default: yarn
+  extra-cache-path:
+    description: 'Extra paths for cache'
+    required: false
   working-directory:
     description: 'Working Directory'
     required: false
@@ -101,13 +100,20 @@ runs:
       if: inputs.cache-strategy != 'pnpm'
       uses: actions/cache@v3
       with:
-        path: ${{ inputs.cache-path }}
+        path: node_modules
         key: node-v${{ inputs.node }}-${{ steps.info_for_cache.outputs.CACHE_HASH }}
 
     - name: install dependencies
       run: ${{ inputs.install-command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
+
+    - name: download extra cache
+      if: inputs.extra-cache-path != ''
+      uses: actions/download-artifact@v3
+      with:
+        name: extra-cache
+        path: ${{ inputs.extra-cache-path }}
 
     - name: build
       run: ${{ inputs.build-command }}
@@ -165,4 +171,10 @@ runs:
           - Log URL: ${{ steps.deploy_preview.outputs.NETLIFY_LOGS_URL }}
           - Preview URL: ${{ steps.deploy_preview.outputs.NETLIFY_PREVIEW_URL }}
         edit-mode: replace
-    
+
+    - name: upload extra cache
+      if: inputs.extra-cache-path != ''
+      uses: actions/upload-artifact@v3
+      with:
+        name: extra-cache
+        path: ${{ inputs.extra-cache-path }}
