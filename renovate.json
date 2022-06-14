@@ -1,23 +1,12 @@
 {
-  "extends": [
-    "config:base",
-    "schedule:monthly",
-    "group:allNonMajor"
-  ],
-  "rebaseWhen": "conflicted",
-  "labels": [
-    "dependencies"
-  ],
-  "rangeStrategy": "bump",
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Onboarding preset for use with ThunderMiracle's repos",
+  "extends": ["github>thundermiracle/.github"],
+  "automerge": true,
   "packageRules": [
     {
       "groupName": "GatsbyJS yarn example",
-      "matchPaths": [
-        "examples/gatsby-starter-default/**"
-      ]
+      "matchPaths": ["examples/gatsby-starter-default/**"]
     }
-  ],
-  "ignoreDeps": [
-    "node"
   ]
 }
