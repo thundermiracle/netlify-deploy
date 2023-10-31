@@ -90,7 +90,7 @@ runs:
       shell: bash
 
     - name: set up node.js v${{ inputs.node }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node }}
         cache: ${{ inputs.cache-strategy }}
