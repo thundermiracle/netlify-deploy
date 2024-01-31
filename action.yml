@@ -98,14 +98,14 @@ runs:
 
     - name: cache node_modules
       if: inputs.cache-strategy != 'pnpm'
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: node_modules
         key: node-v${{ inputs.node }}-${{ steps.info_for_cache.outputs.CACHE_HASH }}
 
     - name: cache extra paths
       if: inputs.extra-cache-path != ''
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ inputs.extra-cache-path }}
         key: extra-cache-v${{ inputs.node }}-${{ github.sha }}
